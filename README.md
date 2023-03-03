@@ -1,8 +1,9 @@
 # Easy Connectivity
 
-## from an android developers who hate boilerplate code
-
 ---
+[![](https://jitpack.io/v/mahmoud947/easy_connectivity.svg)](https://jitpack.io/#mahmoud947/easy_connectivity)
+
+## from an android developers who hate boilerplate code
 
 ## Step 1. Add the JitPack repository to your build file
 
@@ -23,7 +24,7 @@ allprojects {
 
 ```gradle
 dependencies {
-         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0-beta1'
+         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0-beta3'
  }
 ```
 
@@ -39,6 +40,12 @@ dependencies {
 ```xml
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
+
+## add ACCESS_NETWORK_STATE permission
+
+```xml
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  ```
 
 ---
 
@@ -86,6 +93,16 @@ class MainActivity : AppCompatActivity() {
 ```
 
 - ### with callBack
+
+**NOTE**
+
+## add ACCESS_NETWORK_STATE permission
+
+```xml
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  ```
+
+---
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
