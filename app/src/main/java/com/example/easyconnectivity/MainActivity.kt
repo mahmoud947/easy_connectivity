@@ -1,14 +1,13 @@
 package com.example.easyconnectivity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.easy_connectivity.EasyConnectivity
-import com.example.easy_connectivity.NetworkMonitorCallback
 import com.example.easyconnectivity.databinding.ActivityMainBinding
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -19,13 +18,17 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
 
-        easyConnectivity = EasyConnectivity.Builder(context = this)
-            .setAcceptedHttpCodes(listOf(200))
-            .build()
+        easyConnectivity = EasyConnectivity.getInstance(applicationContext.getSystemService())
 
 
-        if (easyConnectivity.isConnected()){
-            Toast.makeText(this,"connected",Toast.LENGTH_SHORT).show()
+        if (easyConnectivity.isConnected()) {
+            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
+        }
+        lifecycleScope.launchWhenStarted {
+            easyConnectivity.networkState.collect {
+                Toast.makeText(this@MainActivity, it.name, Toast.LENGTH_SHORT).show()
+            }
+
         }
 
     }

@@ -1,37 +1,29 @@
 package com.example.easy_connectivity
 
-import android.content.Context
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
-import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest.Builder
-import android.os.AsyncTask
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.util.Log
-import androidx.core.content.getSystemService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.distinctUntilChanged
 import java.net.HttpURLConnection
 import java.net.URL
 
 
-private const val TAG = "ConnectivityManagerNetw"
+private const val TAG = "ConnectivityManagerNetwork"
 
 class EasyConnectivity private constructor(
-    private val context: Context,
+    private val connectivityManager: ConnectivityManager,
     private val connectionTimeOut: Int,
     private val url: String,
     private val acceptedHttpCodes: List<Int>
 ) : NetworkMonitor {
 
-    override val networkState: Flow<NetworkState> = callbackFlow<NetworkState> {
+    override val networkState: Flow<NetworkState> = callbackFlow {
 
-        val connectivityManager = context.getSystemService<ConnectivityManager>()
 
         val callback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -64,16 +56,15 @@ class EasyConnectivity private constructor(
         }
 
 
-        connectivityManager?.registerDefaultNetworkCallback(callback)
+        connectivityManager.registerDefaultNetworkCallback(callback)
 
         awaitClose {
-            connectivityManager?.unregisterNetworkCallback(callback)
+            connectivityManager.unregisterNetworkCallback(callback)
         }
 
     }.distinctUntilChanged()
 
     override fun callBack(callback: NetworkMonitorCallback) {
-        val connectivityManager = context.getSystemService<ConnectivityManager>()
 
         val mCallback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
@@ -100,23 +91,19 @@ class EasyConnectivity private constructor(
         }
 
 
-        connectivityManager?.registerDefaultNetworkCallback(mCallback)
+        connectivityManager.registerDefaultNetworkCallback(mCallback)
     }
 
-
     override fun isConnected(): Boolean {
-        val connectivityManager = context.getSystemService<ConnectivityManager>()
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    return true
-                }
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return true
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                return true
             }
         }
         return false
@@ -135,7 +122,6 @@ class EasyConnectivity private constructor(
         }
     }
 
-
     private fun isOline(): Boolean {
         return try {
             val url: URL = URL(this.url)
@@ -151,29 +137,19 @@ class EasyConnectivity private constructor(
         }
     }
 
-
-    class Builder(private val context: Context) {
-
-        private var connectionTimeOut: Int = 1000
-        private var url: String = "https://www.google.com/"
-        private var acceptedHttpCodes: List<Int> = listOf(200)
-
-        fun setConnectionTimeOut(connectionTimeOut: Int) =
-            apply { this.connectionTimeOut = connectionTimeOut }
-
-        fun setUrl(url: String) = apply { this.url = url }
-
-        fun setAcceptedHttpCodes(acceptedHttpCodes: List<Int>) =
-            apply { this.acceptedHttpCodes = acceptedHttpCodes }
-
-        fun build() =
-            EasyConnectivity(
-                context = context,
-                connectionTimeOut = connectionTimeOut,
-                url = url,
-                acceptedHttpCodes = acceptedHttpCodes
-            )
+    companion object {
+        private var easyConnectivity: EasyConnectivity? = null
+        fun getInstance(
+            context: ConnectivityManager?,
+            connectionTimeOut: Int = 1000,
+            url: String = "https://www.google.com/",
+            acceptedHttpCodes: List<Int> = listOf(200)
+        ): EasyConnectivity {
+            if (easyConnectivity == null) {
+                easyConnectivity =
+                    context?.let { EasyConnectivity(it, connectionTimeOut, url, acceptedHttpCodes) }
+            }
+            return easyConnectivity!!
+        }
     }
-
-
 }
