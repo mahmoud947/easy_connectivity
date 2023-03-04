@@ -52,7 +52,6 @@ dependencies {
 
 
         easyConnectivity = EasyConnectivity.Builder(context = this)
-            .setAcceptedHttpCodes(listOf(200))
             .build()
 
 
