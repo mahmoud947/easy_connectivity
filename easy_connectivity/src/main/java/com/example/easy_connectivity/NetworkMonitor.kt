@@ -11,4 +11,6 @@ interface NetworkMonitor {
     val networkState:Flow<NetworkState>
     fun callBack(callback: NetworkMonitorCallback)
 
+    fun isConnected():Boolean
+
 }
