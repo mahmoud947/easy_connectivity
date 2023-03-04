@@ -24,11 +24,45 @@ allprojects {
 
 ```gradle
 dependencies {
-         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0-beta3'
+         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0-beta4'
  }
 ```
 
 ## Basic Usage
+
+- ### Basic check
+
+---
+  **NOTE**
+
+## add ACCESS_NETWORK_STATE permission
+
+```xml
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  ```
+
+  ```kotlin
+  class MainActivity : AppCompatActivity() {
+    lateinit var binding: ActivityMainBinding
+
+    private lateinit var easyConnectivity: EasyConnectivity
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+
+        easyConnectivity = EasyConnectivity.Builder(context = this)
+            .setAcceptedHttpCodes(listOf(200))
+            .build()
+
+
+        if (easyConnectivity.isConnected()){
+            Toast.makeText(this,"connected",Toast.LENGTH_SHORT).show()
+        }
+
+    }
+}
+```
 
 - ### with Flow
 
