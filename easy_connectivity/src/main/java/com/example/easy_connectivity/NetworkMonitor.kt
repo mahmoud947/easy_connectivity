@@ -13,4 +13,6 @@ interface NetworkMonitor {
 
     fun isConnected():Boolean
 
+    fun networkType():NetworkType
+
 }

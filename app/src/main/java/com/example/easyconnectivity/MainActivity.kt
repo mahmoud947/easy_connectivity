@@ -7,6 +7,7 @@ import androidx.core.content.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.easy_connectivity.EasyConnectivity
+import com.example.easy_connectivity.NetworkState
 import com.example.easyconnectivity.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,26 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycleScope.launchWhenStarted {
             easyConnectivity.networkState.collect {
-                Toast.makeText(this@MainActivity, it.name, Toast.LENGTH_SHORT).show()
+                when (it) {
+                    is NetworkState.AvailableWithInternet -> {
+                        Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    is NetworkState.AvailableWithOutInternet -> {
+                        Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    is NetworkState.UnAvailable -> {
+                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    is NetworkState.Lost -> {
+                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    is NetworkState.Losing -> {
+                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+
             }
 
         }

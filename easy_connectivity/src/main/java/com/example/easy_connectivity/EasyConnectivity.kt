@@ -30,9 +30,9 @@ class EasyConnectivity private constructor(
                 super.onAvailable(network)
                 launch(Dispatchers.IO) {
                     if (isOline()) {
-                        channel.trySend(NetworkState.AvailableWithInternet)
+                        channel.trySend(NetworkState.AvailableWithInternet(networkType()))
                     } else {
-                        channel.trySend(NetworkState.AvailableWithOutInternet)
+                        channel.trySend(NetworkState.AvailableWithOutInternet(networkType()))
                     }
                 }
             }
@@ -109,6 +109,21 @@ class EasyConnectivity private constructor(
         return false
     }
 
+    override fun networkType(): NetworkType {
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                return NetworkType.CELLULAR
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return NetworkType.WIFI
+            } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                return NetworkType.ETHERNET
+            }
+        }
+        return NetworkType.NULL
+    }
+
     @Suppress("DEPRECATION")
     private fun ConnectivityManager?.isCurrentlyConnected() = when (this) {
         null -> false
@@ -129,8 +144,8 @@ class EasyConnectivity private constructor(
             connection.connectTimeout = this.connectionTimeOut
             connection.connect()
             val code = connection.responseCode
+            connection.disconnect()
             code in this.acceptedHttpCodes
-
         } catch (e: Exception) {
             e.printStackTrace()
             false
