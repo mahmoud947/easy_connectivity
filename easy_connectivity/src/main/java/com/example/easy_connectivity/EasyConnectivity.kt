@@ -69,7 +69,7 @@ class EasyConnectivity private constructor(
         val mCallback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                callback.onAvailable()
+                callback.onAvailable(networkType())
             }
 
             override fun onLost(network: Network) {
