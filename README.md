@@ -24,7 +24,7 @@ allprojects {
 
 ```gradle
 dependencies {
-         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0-beta4'
+         implementation 'com.github.mahmoud947:easy_connectivity:1.0.0'
  }
 ```
 
@@ -50,10 +50,8 @@ dependencies {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-
-        easyConnectivity = EasyConnectivity.Builder(context = this)
-            .build()
-
+          easyConnectivity =
+            EasyConnectivity.getInstance(systemService = applicationContext.getSystemService())
 
         if (easyConnectivity.isConnected()){
             Toast.makeText(this,"connected",Toast.LENGTH_SHORT).show()
@@ -90,35 +88,38 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        easyConnectivity = EasyConnectivity.Builder(context = this)
-            .setUrl("https://www.google.com/")
-            .setAcceptedHttpCodes(listOf(200))
-            .setConnectionTimeOut(2000)
-            .build()
+         easyConnectivity =
+            EasyConnectivity.getInstance(
+                systemService = applicationContext.getSystemService(),
+                url = "https://www.google.com/",
+                acceptedHttpCodes = listOf(200),
+                connectionTimeOut = 200)
 
         lifecycleScope.launchWhenStarted {
-
             easyConnectivity.networkState.collect {
                 when (it) {
-                    NetworkState.AvailableWithInternet -> {
+                    is NetworkState.AvailableWithInternet -> {
                         // connected without internet
+                        val networkType = it.networkType.name
+                        /*
+                        WIFI,
+                        MOBILE,
+                        NON
+                         */
                     }
-
-                    NetworkState.AvailableWithOutInternet -> {
+                    is NetworkState.AvailableWithOutInternet -> {
                         // connected with internet
                     }
-                    NetworkState.UnAvailable -> {
+                    is NetworkState.UnAvailable -> {
                         // not connected
                     }
-                    NetworkState.Losing -> {
+                    is NetworkState.Losing -> {
                         // Losing connect
                     }
-
-                    NetworkState.Lost -> {
+                    is NetworkState.Lost -> {
                         // lost connect
                     }
                 }
-
             }
         }
     }
@@ -146,9 +147,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        easyConnectivity = EasyConnectivity.Builder(context = this)
-            .setAcceptedHttpCodes(listOf(200))
-            .build()
+        easyConnectivity =
+            EasyConnectivity.getInstance(
+                systemService = applicationContext.getSystemService()
+            )
 
         easyConnectivity.callBack(object : NetworkMonitorCallback {
             override fun onAvailable() {
