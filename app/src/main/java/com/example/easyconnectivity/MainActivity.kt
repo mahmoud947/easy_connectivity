@@ -18,9 +18,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-
-        easyConnectivity = EasyConnectivity.getInstance(applicationContext.getSystemService())
-
+        easyConnectivity =
+            EasyConnectivity.getInstance(
+                systemService = applicationContext.getSystemService()
+            )
 
         if (easyConnectivity.isConnected()) {
             Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
@@ -29,27 +30,28 @@ class MainActivity : AppCompatActivity() {
             easyConnectivity.networkState.collect {
                 when (it) {
                     is NetworkState.AvailableWithInternet -> {
-                        Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT)
-                            .show()
+                        // connected without internet
+                        val networkType = it.networkType.name
+                        /*
+                        WIFI,
+                        MOBILE,
+                        NON
+                         */
                     }
                     is NetworkState.AvailableWithOutInternet -> {
-                        Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT)
-                            .show()
+                        // connected with internet
                     }
                     is NetworkState.UnAvailable -> {
-                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                    is NetworkState.Lost -> {
-                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
+                        // not connected
                     }
                     is NetworkState.Losing -> {
-                        Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
+                        // Losing connect
+                    }
+                    is NetworkState.Lost -> {
+                        // lost connect
                     }
                 }
-
             }
-
         }
-
     }
 }

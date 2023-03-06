@@ -24,7 +24,6 @@ class EasyConnectivity private constructor(
 
     override val networkState: Flow<NetworkState> = callbackFlow {
 
-
         val callback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
@@ -45,16 +44,13 @@ class EasyConnectivity private constructor(
             override fun onUnavailable() {
                 super.onUnavailable()
                 channel.trySend(NetworkState.UnAvailable)
-
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
                 super.onLosing(network, maxMsToLive)
                 channel.trySend(NetworkState.Losing)
             }
-
         }
-
 
         connectivityManager.registerDefaultNetworkCallback(callback)
 
@@ -80,16 +76,13 @@ class EasyConnectivity private constructor(
             override fun onUnavailable() {
                 super.onUnavailable()
                 callback.onUnAvailable()
-
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
                 super.onLosing(network, maxMsToLive)
                 callback.onLosing()
             }
-
         }
-
 
         connectivityManager.registerDefaultNetworkCallback(mCallback)
     }
@@ -127,14 +120,10 @@ class EasyConnectivity private constructor(
     @Suppress("DEPRECATION")
     private fun ConnectivityManager?.isCurrentlyConnected() = when (this) {
         null -> false
-        else -> when {
-            VERSION.SDK_INT >= VERSION_CODES.M ->
-                activeNetwork
-                    ?.let(::getNetworkCapabilities)
-                    ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    ?: false
-            else -> activeNetworkInfo?.isConnected ?: false
-        }
+        else -> activeNetwork
+            ?.let(::getNetworkCapabilities)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            ?: false
     }
 
     private fun isOline(): Boolean {
@@ -155,14 +144,14 @@ class EasyConnectivity private constructor(
     companion object {
         private var easyConnectivity: EasyConnectivity? = null
         fun getInstance(
-            context: ConnectivityManager?,
+            systemService: ConnectivityManager?,
             connectionTimeOut: Int = 1000,
             url: String = "https://www.google.com/",
             acceptedHttpCodes: List<Int> = listOf(200)
         ): EasyConnectivity {
             if (easyConnectivity == null) {
                 easyConnectivity =
-                    context?.let { EasyConnectivity(it, connectionTimeOut, url, acceptedHttpCodes) }
+                    systemService?.let { EasyConnectivity(it, connectionTimeOut, url, acceptedHttpCodes) }
             }
             return easyConnectivity!!
         }
