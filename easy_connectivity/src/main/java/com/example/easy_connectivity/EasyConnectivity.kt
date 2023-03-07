@@ -4,8 +4,6 @@ import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -17,18 +15,18 @@ private const val TAG = "ConnectivityManagerNetwork"
 
 class EasyConnectivity private constructor(
     private val connectivityManager: ConnectivityManager,
-    private val connectionTimeOut: Int,
-    private val url: String,
-    private val acceptedHttpCodes: List<Int>
 ) : NetworkMonitor {
-
-    override val networkState: Flow<NetworkState> = callbackFlow {
+    override fun getNetworkStateFlow(
+        connectionTimeOut: Int,
+        url: String,
+        acceptedHttpCodes: List<Int>
+    ): Flow<NetworkState> = callbackFlow {
 
         val callback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 launch(Dispatchers.IO) {
-                    if (isOline()) {
+                    if (isOline(connectionTimeOut, url, acceptedHttpCodes)) {
                         channel.trySend(NetworkState.AvailableWithInternet(networkType()))
                     } else {
                         channel.trySend(NetworkState.AvailableWithOutInternet(networkType()))
@@ -58,7 +56,8 @@ class EasyConnectivity private constructor(
             connectivityManager.unregisterNetworkCallback(callback)
         }
 
-    }.distinctUntilChanged()
+    }
+
 
     override fun callBack(callback: NetworkMonitorCallback) {
 
@@ -126,15 +125,17 @@ class EasyConnectivity private constructor(
             ?: false
     }
 
-    private fun isOline(): Boolean {
+    private fun isOline(connectionTimeOut: Int,
+                        url: String,
+                        acceptedHttpCodes: List<Int>): Boolean {
         return try {
-            val url: URL = URL(this.url)
+            val url = URL(url)
             val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
-            connection.connectTimeout = this.connectionTimeOut
+            connection.connectTimeout = connectionTimeOut
             connection.connect()
             val code = connection.responseCode
             connection.disconnect()
-            code in this.acceptedHttpCodes
+            code in acceptedHttpCodes
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -145,13 +146,10 @@ class EasyConnectivity private constructor(
         private var easyConnectivity: EasyConnectivity? = null
         fun getInstance(
             systemService: ConnectivityManager?,
-            connectionTimeOut: Int = 1000,
-            url: String = "https://www.google.com/",
-            acceptedHttpCodes: List<Int> = listOf(200)
         ): EasyConnectivity {
             if (easyConnectivity == null) {
                 easyConnectivity =
-                    systemService?.let { EasyConnectivity(it, connectionTimeOut, url, acceptedHttpCodes) }
+                    systemService?.let { EasyConnectivity(it) }
             }
             return easyConnectivity!!
         }

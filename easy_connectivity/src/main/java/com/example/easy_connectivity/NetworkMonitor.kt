@@ -6,7 +6,11 @@ import kotlinx.coroutines.flow.Flow
  * Utility for reporting app connectivity status
  */
 interface NetworkMonitor {
-    val networkState: Flow<NetworkState>
+    fun getNetworkStateFlow(connectionTimeOut: Int = 1000,
+                            url: String = "https://www.google.com/",
+                            acceptedHttpCodes: List<Int> = listOf(200)): Flow<NetworkState>
+
+
     fun callBack(callback: NetworkMonitorCallback)
 
     fun isConnected(): Boolean

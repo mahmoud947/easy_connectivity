@@ -33,12 +33,13 @@ dependencies {
 - ### Basic check
 
 ---
-  **NOTE**
+**NOTE**
 
 ## add ACCESS_NETWORK_STATE permission
 
 ```xml
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   ```
 
   ```kotlin
@@ -50,11 +51,11 @@ dependencies {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-          easyConnectivity =
+        easyConnectivity =
             EasyConnectivity.getInstance(systemService = applicationContext.getSystemService())
 
-        if (easyConnectivity.isConnected()){
-            Toast.makeText(this,"connected",Toast.LENGTH_SHORT).show()
+        if (easyConnectivity.isConnected()) {
+            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -69,13 +70,15 @@ dependencies {
 ## add internet permission
 
 ```xml
-<uses-permission android:name="android.permission.INTERNET"/>
+
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
 ## add ACCESS_NETWORK_STATE permission
 
 ```xml
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   ```
 
 ---
@@ -88,15 +91,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-         easyConnectivity =
-            EasyConnectivity.getInstance(
-                systemService = applicationContext.getSystemService(),
-                url = "https://www.google.com/",
-                acceptedHttpCodes = listOf(200),
-                connectionTimeOut = 200)
+        easyConnectivity =
+            EasyConnectivity.getInstance(applicationContext.getSystemService())
 
         lifecycleScope.launchWhenStarted {
-            easyConnectivity.networkState.collect {
+            easyConnectivity.getNetworkState().collect {
                 when (it) {
                     is NetworkState.AvailableWithInternet -> {
                         // connected without internet
@@ -133,7 +132,8 @@ class MainActivity : AppCompatActivity() {
 ## add ACCESS_NETWORK_STATE permission
 
 ```xml
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   ```
 
 ---
