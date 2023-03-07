@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface NetworkMonitor {
     fun getNetworkStateFlow(connectionTimeOut: Int = 1000,
                             url: String = "https://www.google.com/",
-                            acceptedHttpCodes: List<Int> = listOf(200)): Flow<NetworkState>
+                            acceptedHttpCodes: List<Int> = listOf(200)): Flow<NetworkStateV2>
 
 
     fun callBack(callback: NetworkMonitorCallback)

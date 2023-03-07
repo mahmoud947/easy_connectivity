@@ -20,33 +20,33 @@ class EasyConnectivity private constructor(
         connectionTimeOut: Int,
         url: String,
         acceptedHttpCodes: List<Int>
-    ): Flow<NetworkState> = callbackFlow {
+    ): Flow<NetworkStateV2> = callbackFlow {
 
         val callback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 launch(Dispatchers.IO) {
                     if (isOline(connectionTimeOut, url, acceptedHttpCodes)) {
-                        channel.trySend(NetworkState.AvailableWithInternet(networkType()))
+                        channel.trySend(NetworkStateV2(true, networkType()))
                     } else {
-                        channel.trySend(NetworkState.AvailableWithOutInternet(networkType()))
+                        channel.trySend(NetworkStateV2(false, networkType()))
                     }
                 }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                channel.trySend(NetworkState.Lost)
+                channel.trySend(NetworkStateV2(false, networkType()))
             }
 
             override fun onUnavailable() {
                 super.onUnavailable()
-                channel.trySend(NetworkState.UnAvailable)
+                channel.trySend(NetworkStateV2(false, networkType()))
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
                 super.onLosing(network, maxMsToLive)
-                channel.trySend(NetworkState.Losing)
+                channel.trySend(NetworkStateV2(false, networkType()))
             }
         }
 

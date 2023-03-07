@@ -24,29 +24,7 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycleScope.launchWhenStarted {
             easyConnectivity.getNetworkStateFlow().collect {
-                Toast.makeText(this@MainActivity, it.toString(), Toast.LENGTH_SHORT).show()
-
-//                when (it) {
-//                    is NetworkState.AvailableWithInternet -> {
-//                        /*
-//                        WIFI,
-//                        MOBILE,
-//                        NON
-//                         */
-//                    }
-//                    is NetworkState.AvailableWithOutInternet -> {
-//                        Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT).show()
-//                    }
-//                    is NetworkState.UnAvailable -> {
-//                        Toast.makeText(this@MainActivity, "UnAvailable", Toast.LENGTH_SHORT).show()
-//                    }
-//                    is NetworkState.Losing -> {
-//                        Toast.makeText(this@MainActivity, "Losing", Toast.LENGTH_SHORT).show()
-//                    }
-//                    is NetworkState.Lost -> {
-//                        Toast.makeText(this@MainActivity, "Lost", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
+                Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT).show()
             }
         }
     }
