@@ -27,26 +27,31 @@ class EasyConnectivity private constructor(
                 super.onAvailable(network)
                 launch(Dispatchers.IO) {
                     if (isOline(connectionTimeOut, url, acceptedHttpCodes)) {
-                        channel.trySend(NetworkStateV2(true, networkType()))
+                        channel.trySend(NetworkStateV2(ConnectionState.Available, networkType()))
                     } else {
-                        channel.trySend(NetworkStateV2(false, networkType()))
+                        channel.trySend(
+                            NetworkStateV2(
+                                ConnectionState.AvailableWithOutInternet,
+                                networkType()
+                            )
+                        )
                     }
                 }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                channel.trySend(NetworkStateV2(false, networkType()))
+                channel.trySend(NetworkStateV2(ConnectionState.Lost, networkType()))
             }
 
             override fun onUnavailable() {
                 super.onUnavailable()
-                channel.trySend(NetworkStateV2(false, networkType()))
+                channel.trySend(NetworkStateV2(ConnectionState.Unavailable, networkType()))
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
                 super.onLosing(network, maxMsToLive)
-                channel.trySend(NetworkStateV2(false, networkType()))
+                channel.trySend(NetworkStateV2(ConnectionState.Losing, networkType()))
             }
         }
 
@@ -125,9 +130,11 @@ class EasyConnectivity private constructor(
             ?: false
     }
 
-    private fun isOline(connectionTimeOut: Int,
-                        url: String,
-                        acceptedHttpCodes: List<Int>): Boolean {
+    private fun isOline(
+        connectionTimeOut: Int,
+        url: String,
+        acceptedHttpCodes: List<Int>
+    ): Boolean {
         return try {
             val url = URL(url)
             val connection: HttpURLConnection = url.openConnection() as HttpURLConnection

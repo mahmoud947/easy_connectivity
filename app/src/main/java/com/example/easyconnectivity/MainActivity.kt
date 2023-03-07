@@ -24,7 +24,19 @@ class MainActivity : AppCompatActivity() {
         }
         lifecycleScope.launchWhenStarted {
             easyConnectivity.getNetworkStateFlow().collect {
-                Toast.makeText(this@MainActivity, it.networkType.name, Toast.LENGTH_SHORT).show()
+                val networkType = it.networkType.name
+                /* WIFI,
+                 CELLULAR,
+                 ETHERNET,
+                 NULL */
+
+                val connectionState = it.connectionState.name
+                /* Available,
+                   AvailableWithOutInternet,
+                   Lost,
+                   Unavailable,
+                   Losing
+                 */
             }
         }
     }

@@ -1,4 +1,4 @@
 package com.example.easy_connectivity
 
-data class NetworkStateV2(val connected: Boolean, val networkType: NetworkType)
+data class NetworkStateV2(val connectionState: ConnectionState, val networkType: NetworkType)
 
