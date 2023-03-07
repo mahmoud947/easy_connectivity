@@ -3,6 +3,7 @@
 ---
 [![](https://jitpack.io/v/mahmoud947/easy_connectivity.svg)](https://jitpack.io/#mahmoud947/easy_connectivity)
 
+
 ## from an android developers who hate boilerplate code
 
 ## Step 1. Add the JitPack repository to your build file
@@ -52,7 +53,7 @@ dependencies {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         easyConnectivity =
-            EasyConnectivity.getInstance(systemService = applicationContext.getSystemService())
+            EasyConnectivity.getInstance(applicationContext.getSystemService())
 
         if (easyConnectivity.isConnected()) {
             Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
@@ -95,30 +96,20 @@ class MainActivity : AppCompatActivity() {
             EasyConnectivity.getInstance(applicationContext.getSystemService())
 
         lifecycleScope.launchWhenStarted {
-            easyConnectivity.getNetworkState().collect {
-                when (it) {
-                    is NetworkState.AvailableWithInternet -> {
-                        // connected without internet
-                        val networkType = it.networkType.name
-                        /*
-                        WIFI,
-                        MOBILE,
-                        NON
-                         */
-                    }
-                    is NetworkState.AvailableWithOutInternet -> {
-                        // connected with internet
-                    }
-                    is NetworkState.UnAvailable -> {
-                        // not connected
-                    }
-                    is NetworkState.Losing -> {
-                        // Losing connect
-                    }
-                    is NetworkState.Lost -> {
-                        // lost connect
-                    }
-                }
+            easyConnectivity.getNetworkStateFlow().collect {
+                val networkType = it.networkType.name
+                /* WIFI,
+                 CELLULAR,
+                 ETHERNET,
+                 NULL */
+
+                val connectionState = it.connectionState.name
+                /* Available,
+                   AvailableWithOutInternet,
+                   Lost,
+                   Unavailable,
+                   Losing
+                 */
             }
         }
     }
